@@ -1,6 +1,10 @@
+import { config } from "dotenv";
 import { MongoClient, ServerApiVersion } from "mongodb";
+
+config();
+
 export const DB_NAME = "caspex-graphql";
-const uri = `mongodb+srv://jessyavalos16:jzYkeVR3boWnb29Z@cluster0.k5gk7k7.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@cluster0.k5gk7k7.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 export const client = new MongoClient(uri, {

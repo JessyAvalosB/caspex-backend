@@ -1,20 +1,19 @@
-import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from "@apollo/server/standalone";
+import cors from "cors";
+import express from "express";
+import { graphqlHTTP } from "express-graphql";
 
-import dotenv from "dotenv";
+import { schema } from "./graphql/schema";
 
-import { schema } from "./schema";
+// Express
+const app = express();
 
-if (process.env.NODE_ENV !== "production") {
-  dotenv.config();
-}
+app.use(
+  cors({
+    origin: ["http://localhost:3000"],
+  })
+);
 
-import "./db/";
+app.all("/graphql", graphqlHTTP({ schema, graphiql: true }));
 
-export const server = new ApolloServer({
-  schema,
-});
-
-startStandaloneServer(server, {
-  listen: { port: 4000 },
-}).then(({ url }) => console.log(`🚀 Server ready at ${url}`));
+app.listen({ port: 4000 });
+console.log("🚀 Server listening on http://localhost:4000/graphql");

@@ -1,12 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2016",
+    "lib": ["es6"],
     "module": "commonjs",
+    "rootDir": "src",
+    "resolveJsonModule": true,
+    "allowJs": true,
     "outDir": "dist",
-    "rootDir": ".",
-    "strict": true,
-    "moduleResolution": "node",
     "esModuleInterop": true,
-    "sourceMap": true
-  }
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "skipLibCheck": true,
+  },
+  "include": ["src/**/*"],
+  "exclude": ["dist"]
 }

@@ -1,13 +1,7 @@
-import { NexusGenObjects } from "./../../nexus-typegen";
-import {
-  Document,
-  InsertOneResult,
-  ObjectId,
-  UpdateResult,
-  WithId,
-} from "mongodb";
+import { Document, ObjectId, UpdateResult, WithId } from "mongodb";
 
-import { DB_NAME, client } from "../db";
+import { DB_NAME, client } from "../db/mongodb_config";
+import { ICustomer } from "../interfaces/Customer.interface";
 
 export const getCustomer = async (
   id: string
@@ -17,6 +11,7 @@ export const getCustomer = async (
     const db = await client.db(DB_NAME);
     const collection = await db.collection("customers");
     const cutomer = await collection.findOne({ _id: new ObjectId(id) });
+    console.log(cutomer);
     return cutomer;
   } catch (error) {
     console.error(error);
@@ -42,8 +37,8 @@ export const getCustomers = async (): Promise<WithId<Document>[]> => {
 };
 
 export const addCustomer = async (
-  newCustomer: NexusGenObjects["Customer"]
-): Promise<InsertOneResult<Document> | null> => {
+  newCustomer: ICustomer
+): Promise<WithId<Document> | null> => {
   const { email, name, phone } = newCustomer;
   if (email === "" && name === "" && phone === "") {
     return null;
@@ -53,7 +48,14 @@ export const addCustomer = async (
     const db = await client.db(DB_NAME);
     const collection = await db.collection("customers");
     const didInserted = await collection.insertOne({ email, name, phone });
-    return didInserted;
+    if (didInserted.insertedId) {
+      const cutomer = await collection.findOne({
+        _id: new ObjectId(didInserted.insertedId),
+      });
+      return cutomer;
+    } else {
+      return null;
+    }
   } catch (error) {
     console.error(error);
     return null;
@@ -63,8 +65,8 @@ export const addCustomer = async (
 };
 
 export const updateCustomer = async (
-  customer: NexusGenObjects["Customer"]
-): Promise<UpdateResult<Document> | null> => {
+  customer: ICustomer
+): Promise<WithId<Document> | null> => {
   try {
     await client.connect();
     const db = await client.db(DB_NAME);
@@ -79,7 +81,14 @@ export const updateCustomer = async (
         },
       }
     );
-    return didUpdated;
+    if (didUpdated.modifiedCount === 1) {
+      const cutomer = await collection.findOne({
+        _id: new ObjectId(customer._id),
+      });
+      return cutomer;
+    } else {
+      return null;
+    }
   } catch (error) {
     console.error(error);
     return null;
@@ -88,16 +97,16 @@ export const updateCustomer = async (
   }
 };
 
-export const deleteCustomer = async (id: string) => {
+export const deleteCustomer = async (_id: string) => {
   try {
     await client.connect();
     const db = await client.db(DB_NAME);
     const collection = await db.collection("customers");
-    const didUpdated = await collection.deleteOne({ _id: new ObjectId(id) });
-    return didUpdated;
+    const didUpdated = await collection.deleteOne({ _id: new ObjectId(_id) });
+    return didUpdated.deletedCount === 1;
   } catch (error) {
     console.error(error);
-    return null;
+    return false;
   } finally {
     await client.close();
   }
