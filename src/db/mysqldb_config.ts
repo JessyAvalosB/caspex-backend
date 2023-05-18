@@ -1,15 +1,19 @@
-import { config } from "dotenv";
 import { createConnection } from "promise-mysql";
 
-config();
+import {
+  MSQLDB_HOST,
+  MSQLDB_USER,
+  MSQLDB_PASS,
+  MSQLDB_SCHEMA,
+} from "../config/constants";
 
 export const client = async () => {
   try {
     return await createConnection({
-      host: process.env.MYSQLDB_HOST,
-      user: process.env.MYSQLDB_USER,
-      password: process.env.MYSQLDB_PASS,
-      database: process.env.MYSQLDB_SCHEMA,
+      host: MSQLDB_HOST,
+      user: MSQLDB_USER,
+      password: MSQLDB_PASS,
+      database: MSQLDB_SCHEMA,
     });
   } catch (error) {
     console.error("Error creating connection: ", error);
